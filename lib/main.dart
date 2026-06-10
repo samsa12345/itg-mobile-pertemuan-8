@@ -19,11 +19,12 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FavoriteProvider()),
       ],
       child: MaterialApp(
-        title: 'Mfit Shop',
+        title: 'Sams Shopping',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6C63FF)),
           useMaterial3: true,
+          fontFamily: 'Roboto',
         ),
         home: const HomePage(),
       ),

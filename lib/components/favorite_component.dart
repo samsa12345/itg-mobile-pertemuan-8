@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pert8/providers/favorite_providers.dart';
-import 'package:pert8/pages/favorite_page.dart';
 import 'package:provider/provider.dart';
+import '../providers/favorite_providers.dart';
+import '../pages/favorite_page.dart';
 
 class FavoriteComponent extends StatelessWidget {
   const FavoriteComponent({super.key});
@@ -9,33 +9,47 @@ class FavoriteComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favoriteProvider = context.watch<FavoriteProvider>();
-    final count = favoriteProvider.favorites.length;
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const FavoritePage()),
-            );
-          },
-          icon: const Icon(Icons.favorite),
+    final count = favoriteProvider.favoriteCount;
+
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const FavoritePage()),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white.withOpacity(0.5), width: 1),
         ),
-        if (count > 0)
-        Positioned(
-          right: 6,
-          top: 6,
-          child: CircleAvatar(
-            radius: 8,
-            backgroundColor: Colors.deepOrange,
-            child: Text(
-              '$count',
-              style: const TextStyle(fontSize: 10, color: Colors.white),
-            ),
-          ),
-        )
-      ],
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.favorite, color: Colors.white, size: 20),
+            if (count > 0) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$count',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

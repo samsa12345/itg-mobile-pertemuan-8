@@ -25,250 +25,366 @@ class _DetailPageState extends State<DetailPage> {
         product.images.isNotEmpty ? product.images : [product.thumbnail];
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        title: const Text('Detail Produk',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.cyan,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
-            color: isFav ? Colors.red : Colors.white,
-            onPressed: () => favoriteProvider.toggleFavorite(product),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Image Gallery ──────────────────────────────────────
-            Stack(
-              children: [
-                SizedBox(
-                  height: 300,
-                  width: double.infinity,
-                  child: PageView.builder(
+      backgroundColor: const Color(0xFFF4F3FF),
+      body: CustomScrollView(
+        slivers: [
+          // ── SliverAppBar dengan galeri gambar ──
+          SliverAppBar(
+            expandedHeight: 320,
+            pinned: true,
+            backgroundColor: const Color(0xFF6C63FF),
+            foregroundColor: Colors.white,
+            title: const Text(
+              'Detail Produk',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            actions: [
+              IconButton(
+                icon: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) =>
+                      ScaleTransition(scale: animation, child: child),
+                  child: Icon(
+                    isFav ? Icons.bookmark : Icons.bookmark_border,
+                    key: ValueKey(isFav),
+                    color: isFav ? Colors.amber : Colors.white,
+                  ),
+                ),
+                onPressed: () => favoriteProvider.toggleFavorite(product),
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  PageView.builder(
                     itemCount: allImages.length,
                     onPageChanged: (i) =>
                         setState(() => _currentImageIndex = i),
                     itemBuilder: (_, i) => Image.network(
                       allImages[i],
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.broken_image, size: 60),
+                      errorBuilder: (_, __, ___) => Container(
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.broken_image,
+                            size: 60, color: Colors.grey),
+                      ),
                     ),
                   ),
-                ),
-                if (allImages.length > 1)
+                  // Gradient overlay bawah
                   Positioned(
-                    bottom: 10,
+                    bottom: 0,
                     left: 0,
                     right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        allImages.length,
-                        (i) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          width: _currentImageIndex == i ? 16 : 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: _currentImageIndex == i
-                                ? Colors.cyan
-                                : Colors.white70,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
+                    child: Container(
+                      height: 80,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Colors.black.withOpacity(0.45),
+                            Colors.transparent,
+                          ],
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
-
-            // ── Info Card ──────────────────────────────────────────
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
+                  // Indikator dot gambar
+                  if (allImages.length > 1)
+                    Positioned(
+                      bottom: 16,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          allImages.length,
+                          (i) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 250),
+                            margin:
+                                const EdgeInsets.symmetric(horizontal: 3),
+                            width: _currentImageIndex == i ? 20 : 7,
+                            height: 7,
+                            decoration: BoxDecoration(
+                              color: _currentImageIndex == i
+                                  ? Colors.white
+                                  : Colors.white54,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
+            ),
+          ),
+
+          // ── Konten Detail ──
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category badge
+                  // Badge kategori
                   if (product.category.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                          horizontal: 12, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.cyan.withOpacity(0.15),
+                        color: const Color(0xFF6C63FF).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         product.category.toUpperCase(),
                         style: const TextStyle(
                           fontSize: 11,
-                          color: Colors.cyan,
+                          color: Color(0xFF6C63FF),
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
 
-                  // Title
+                  // Judul
                   Text(
                     product.title,
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A1A2E),
                     ),
                   ),
                   const SizedBox(height: 6),
 
                   // Brand
                   if (product.brand.isNotEmpty)
-                    Text(
-                      'Brand: ${product.brand}',
-                      style: TextStyle(
-                          fontSize: 13, color: Colors.grey[600]),
-                    ),
-                  const SizedBox(height: 12),
-
-                  // Price & Rating row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Rp. ${product.price.toStringAsFixed(0)}',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.cyan,
+                    Row(
+                      children: [
+                        const Icon(Icons.storefront_outlined,
+                            size: 15, color: Colors.grey),
+                        const SizedBox(width: 5),
+                        Text(
+                          product.brand,
+                          style: TextStyle(
+                              fontSize: 13, color: Colors.grey.shade600),
                         ),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.star,
-                              color: Colors.amber, size: 18),
-                          const SizedBox(width: 4),
-                          Text(
-                            product.rating.toStringAsFixed(1),
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15),
+                      ],
+                    ),
+                  const SizedBox(height: 16),
+
+                  // Harga, Rating, Stok dalam satu baris kartu
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        // Harga
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Harga',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Rp ${product.price.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF6C63FF),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Stock
-                  Row(
-                    children: [
-                      Icon(
-                        product.stock > 0
-                            ? Icons.check_circle
-                            : Icons.cancel,
-                        color:
-                            product.stock > 0 ? Colors.green : Colors.red,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        product.stock > 0
-                            ? 'Stok tersedia: ${product.stock}'
-                            : 'Stok habis',
-                        style: TextStyle(
-                          color: product.stock > 0
-                              ? Colors.green
-                              : Colors.red,
-                          fontWeight: FontWeight.w500,
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Description ────────────────────────────────────────
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Deskripsi Produk',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                        // Divider vertikal
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.grey.shade200,
+                        ),
+                        // Rating
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                'Rating',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.star_rounded,
+                                      color: Colors.amber, size: 20),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    product.rating.toStringAsFixed(1),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Divider vertikal
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.grey.shade200,
+                        ),
+                        // Stok
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                'Stok',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                product.stock > 0
+                                    ? '${product.stock}'
+                                    : 'Habis',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: product.stock > 0
+                                      ? const Color(0xFF2ECC71)
+                                      : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    product.description,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[700],
-                        height: 1.5),
+
+                  const SizedBox(height: 16),
+
+                  // Deskripsi
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        )
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.description_outlined,
+                                size: 18, color: Color(0xFF6C63FF)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Deskripsi Produk',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1A1A2E),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          product.description,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade700,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
+                  const SizedBox(height: 100), // ruang buat bottom button
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
 
-      // ── Bottom Action ──────────────────────────────────────────
-      bottomNavigationBar: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
+      // ── Bottom Button ──
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, -3),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: () => favoriteProvider.toggleFavorite(product),
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  isFav ? Colors.red.shade400 : const Color(0xFF6C63FF),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+              elevation: 0,
             ),
-          ],
-        ),
-        child: ElevatedButton.icon(
-          onPressed: () => favoriteProvider.toggleFavorite(product),
-          icon: Icon(isFav ? Icons.favorite : Icons.favorite_border),
-          label: Text(
-              isFav ? 'Hapus dari Favorit' : 'Tambah ke Favorit'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isFav ? Colors.red[400] : Colors.cyan,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  isFav ? Icons.bookmark_remove : Icons.bookmark_add,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  isFav ? 'Hapus dari Favorit' : 'Simpan ke Favorit',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ],
+            ),
           ),
         ),
       ),
