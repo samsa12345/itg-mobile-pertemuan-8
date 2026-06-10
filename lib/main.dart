@@ -4,6 +4,11 @@ import 'providers/product_providers.dart';
 import 'providers/favorite_providers.dart';
 import 'pages/home_page.dart';
 
+// Nama  : Samsa Faridah
+// NIM   : 2306139
+// Tugas Praktikum Pertemuan 8
+
+
 void main() {
   runApp(const MainApp());
 }
